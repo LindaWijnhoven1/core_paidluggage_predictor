@@ -14,7 +14,10 @@ path_input_folder = 'input/' # Path to local input folder, relative to main scri
 path_log_folder = 'log/' # Path to local log folder, relative to main script
 
 # Filenames
-filename_log = 'logfile' 
+filename_log = 'logfile ' + datetime.now().strftime("%Y-%m-%d_%H-%M")
+datetime_log = datetime.now().strftime("%Y-%m-%d_%H-%M")
+
+file_log = filename_log + datetime_log
 
 # Set type of authentication for DWH. Values:
 # - ActiveDirectoryPassword: For Azure Active Directory username/password authentication to SQL Azure.

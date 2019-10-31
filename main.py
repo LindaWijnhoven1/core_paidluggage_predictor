@@ -16,19 +16,14 @@ import prepare_data as prepdat
 import settings as s
 import credentials as c
 #import ridge_regression as rr
-from configure_log import configure_logger as cfglog
+import configure_log as l
 
 def main():
     # Create logger
     log_path = s.path_log_folder
     log_name = s.filename_log
-    logger = cfglog(__name__, log_path + log_name)
+    logger = l.configure_logger(__name__, log_path + log_name)
     logging.getLogger().handlers[1].doRollover()
-
-
-    #log_format = '%(asctime)s - %(name)s - %(levelname)s - %(funcName)s - %(message)s'
-    #logging.basicConfig(format=log_format, level=logging.INFO, stream=sys.stdout)
-    #logger = logging.getLogger()
 
     logger.info('Run  - started ' + str(datetime.now()))
 

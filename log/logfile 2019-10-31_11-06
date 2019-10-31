@@ -1,0 +1,6 @@
+2019-10-31 11:06:37 - INFO - main: Run  - started 2019-10-31 11:06:37.941616
+2019-10-31 11:06:37 - INFO - main: Data retrieval from pickle - started
+2019-10-31 11:06:54 - INFO - main: Data retrieval from pickle - finished
+2019-10-31 11:06:54 - INFO - main: Import pricing levels - started
+2019-10-31 11:07:10 - INFO - main: Import prices - started
+2019-10-31 11:07:17 - INFO - main: Retrieve final dataset - started
