@@ -334,7 +334,7 @@ def delete_columns(data, columns):
     :return pandas.DataFrame: Dataset needed for training models
     """
     for col in columns:
-        data.drop(columns=col)
+        data.drop(col, axis=1, inplace=True)
     return data
 
 
