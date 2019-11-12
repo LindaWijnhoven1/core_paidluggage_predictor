@@ -10,6 +10,16 @@ from azure.datalake.store import core, lib
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
 from datetime import datetime
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder
+from sklearn.preprocessing import StandardScaler
+from sklearn.compose import ColumnTransformer
+
+
+
+# Import EDA packages
+import seaborn as sns
+import matplotlib
+from matplotlib import pyplot as plt
 
 # Custom imports
 import prepare_data as prepdat
@@ -17,6 +27,10 @@ import settings as s
 import credentials as c
 #import ridge_regression as rr
 import configure_log as l
+from models.baseline import baseline as bl
+from models.ridge_regression import ridge_regression as rr
+from models.random_forest_regression import random_forest_regression as rfr
+
 
 def main():
     # Create logger
@@ -43,25 +57,91 @@ def main():
     data_pricing = prepdat.get_pricing_data(raw_data, s.path_input_folder)
 
     logger.info('Import prices - started')
-    data_prices = prepdat.get_prices(data_pricing, s.path_input_folder)
+    data_prices = prepdat.get_prices(data_pricing, s.path_input_folder).fillna(0)
+
+    logger.info('OneHotEncode categorical variables - started')
+    columns_ohe = ['HUB_NL',
+                   'COUNTRY_CODE',
+                   'SOURCE',
+                   'WEEKDAY_OF_DEPARTURE',
+                   'MONTH_OF_DEPARTURE',
+                   'TIMESLOT_OF_DEPARTURE',
+                   'WEEKDAY_OF_BOOKING',
+                   'WEEKDAY_OF_BOOKING_BAG']
+    data_dummies = prepdat.dummy_columns(data_prices, columns_ohe)
 
     logger.info('Retrieve final dataset - started')
-    columns_drop = ['BKR_BOOKING','DEPARTURE_AIRPORT', 'ARRIVAL_AIRPORT']
-    data = prepdat.delete_columns(data_prices, columns_drop)
+    columns_drop = ['DEPARTURE_DATE',
+                    'HUB_NL',
+                   'COUNTRY_CODE',
+                   'SOURCE',
+                   'WEEKDAY_OF_DEPARTURE',
+                   'MONTH_OF_DEPARTURE',
+                   'TIMESLOT_OF_DEPARTURE',
+                   'WEEKDAY_OF_BOOKING',
+                   'WEEKDAY_OF_BOOKING_BAG',
+                   'BKR_BOOKING',
+                   'DEPARTURE_AIRPORT',
+                   'ARRIVAL_AIRPORT',
+                   'BOOKING_DATE',
+                   'BOOKING_DATE_BAG',
+                   'PRICING_TIME',
+                   'LEVEL']
+    data = prepdat.delete_columns(data_dummies, columns_drop)
 
-
-
-
-
-
-    print(data.head())
+    print(len(data.columns))
     print(data.columns)
 
-    X = data[:-1]
-    y = data[-1:]
+    logger.info('Retrieve target and features - started')
+    X = data.drop(['WEIGHT_OF_ITEMS'], axis=1).fillna(0)
+    y = data['WEIGHT_OF_ITEMS'].fillna(0)
 
-    #train_X, test_X, train_y, test_y = train_test_split(X, y, test_size=0.2, random_state=500)
+    logger.info('Standardize continuous features - started')
+    columns_std_x = ['TOTAL_LEG_DISTANCE_KM',
+                   'BOOKING_DBD',
+                   'BOOKING_BAG_DBD',
+                   'LENGTH_OF_STAY',
+                   'NBR_OF_PAX_IN_PNR',
+                   'BOOKING_TICKET_REVENUE_INCL_TAX',
+                   'PRICE_15KG',
+                   'PRICE_20KG',
+                   'PRICE_25KG',
+                   'PRICE_30KG',
+                   'PRICE_40KG',
+                   'PRICE_50KG']
 
+    ct = ColumnTransformer([
+        ('Standardized', StandardScaler(), columns_std_x)
+    ], remainder='passthrough')
+
+    ct.fit_transform(X[columns_std_x])
+
+    logger.info('Target to Numpy - started')
+    y = y.to_numpy().reshape(-1, 1)
+
+    print(X.shape)
+    print(y.shape)
+
+    logger.info('Split test set - started')
+    train_X, test_X, train_y, test_y = train_test_split(X, y, test_size=0.2, random_state=500)
+
+
+
+    if s.run_baseline:
+        logger.info('Set baseline - started')
+        y_mean = np.repeat(train_y.mean(), len(train_y))
+        baseline = bl(train_y, y_mean)
+        print(baseline)
+
+    if s.run_ridge:
+        logger.info('Start training ridge regression - started')
+        ridge = rr(train_X, train_y)
+        print(ridge)
+
+    if s.run_forest:
+        logger.info('Start training random forest regression - started')
+        forest = rfr(train_X, train_y)
+        print(forest)
 
 
 

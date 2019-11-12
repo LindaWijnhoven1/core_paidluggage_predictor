@@ -5,7 +5,7 @@ start_date = '2018-07-01'
 end_date = '2019-06-30'
 
 # Initial parameters to run the script
-from_database = False      # Retrieve data from database (True) or from pickle (False)
+from_database = False        # Retrieve data from database (True) or from pickle (False)
 local_production = True     # Run locally (True) or run production (False)
 
 # Paths
@@ -18,6 +18,12 @@ filename_log = 'logfile ' + datetime.now().strftime("%Y-%m-%d_%H-%M")
 datetime_log = datetime.now().strftime("%Y-%m-%d_%H-%M")
 
 file_log = filename_log + datetime_log
+
+# Runs of models
+run_baseline = False
+run_ridge = False
+run_forest = True
+run_neural = True
 
 # Set type of authentication for DWH. Values:
 # - ActiveDirectoryPassword: For Azure Active Directory username/password authentication to SQL Azure.
