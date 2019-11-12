@@ -22,7 +22,7 @@ file_log = filename_log + datetime_log
 # Runs of models
 run_baseline = False
 run_ridge = False
-run_forest = True
+run_forest = False
 run_neural = True
 
 # Set type of authentication for DWH. Values:

@@ -12,7 +12,8 @@ def ridge_regression(train_x, train_y):
     parameters = {'alpha': [5,6,7,8,9,10,11,12]}
     #cv = {'cv': [3,5]}
     #scorer = make_scorer(rmse_r2, greater_is_better = False)
-    scoring = {'r2': make_scorer(get_r2), 'rmse': make_scorer(get_rmse, greater_is_better=False)}
+    scoring = {'r2': make_scorer(get_r2),
+               'rmse': make_scorer(get_rmse, greater_is_better=False)}
 
     clf = Ridge()
     rr = GridSearchCV(clf, parameters, scoring=scoring, cv=3, refit='rmse')

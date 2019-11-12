@@ -30,6 +30,7 @@ import configure_log as l
 from models.baseline import baseline as bl
 from models.ridge_regression import ridge_regression as rr
 from models.random_forest_regression import random_forest_regression as rfr
+from models.neural_network import neural_network as nn
 
 
 def main():
@@ -132,16 +133,25 @@ def main():
         y_mean = np.repeat(train_y.mean(), len(train_y))
         baseline = bl(train_y, y_mean)
         print(baseline)
+        logger.info('Baseline results: ' + str(baseline))
 
     if s.run_ridge:
         logger.info('Start training ridge regression - started')
         ridge = rr(train_X, train_y)
         print(ridge)
+        logger.info('Ridge regression results: ' + str(ridge))
 
     if s.run_forest:
         logger.info('Start training random forest regression - started')
         forest = rfr(train_X, train_y)
         print(forest)
+        logger.info('Random forest regression results: ' + str(forest))
+
+    if s.run_neural:
+        logger.info('Start training neural network - started')
+        neural = nn(train_X, train_y)
+        print(neural)
+        logger.info('Neural network results: ' + str(neural))
 
 
 
