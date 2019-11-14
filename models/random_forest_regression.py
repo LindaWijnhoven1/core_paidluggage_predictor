@@ -5,8 +5,8 @@ from sklearn.metrics import make_scorer
 
 
 def random_forest_regression(train_x, train_y):
-    parameters = {'max_depth': [1,5,10],
-                  'n_estimators': [10,50,100]}
+    parameters = {'max_depth': [10,15,20,21],
+                  'n_estimators': [100, 200, 500]}
     scoring = {'r2': make_scorer(get_r2), 'rmse': make_scorer(get_rmse, greater_is_better=False)}
 
     clf = RandomForestRegressor()

@@ -30,7 +30,7 @@ import configure_log as l
 from models.baseline import baseline as bl
 from models.ridge_regression import ridge_regression as rr
 from models.random_forest_regression import random_forest_regression as rfr
-from models.neural_network import neural_network as nn
+#from models.neural_network import neural_network as nn
 
 
 def main():

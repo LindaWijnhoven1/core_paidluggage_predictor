@@ -39,4 +39,4 @@ def neural_network(train_x, train_y):
     best_params = grid_result.best_params_
     best_score = grid_result.best_score_
 
-    return scores, best_params, best_scoreapt-get upgrade; apt autoremove
+    return scores, best_params, best_score
