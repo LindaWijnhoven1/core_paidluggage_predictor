@@ -25,12 +25,14 @@ from matplotlib import pyplot as plt
 import prepare_data as prepdat
 import settings as s
 import credentials as c
-#import ridge_regression as rr
 import configure_log as l
 from models.baseline import baseline as bl
 from models.ridge_regression import ridge_regression as rr
+from models.ridge_regression import ridge_cv as rr2
 from models.random_forest_regression import random_forest_regression as rfr
-#from models.neural_network import neural_network as nn
+from models.neural_network import neural_network as nn
+from evaluation_metric import get_rmse, get_r2
+
 
 
 def main():
@@ -90,8 +92,13 @@ def main():
                    'LEVEL']
     data = prepdat.delete_columns(data_dummies, columns_drop)
 
-    print(len(data.columns))
-    print(data.columns)
+    """"Retrieve heatmap correlation"""
+    #corr_matrix = data.corr()
+    #print(corr_matrix)
+    #corr_matrix.to_csv("corr_matrix.csv")
+    """End of heatmap correlation"""
+
+    logger.info('Used features: ' + data.columns)
 
     logger.info('Retrieve target and features - started')
     X = data.drop(['WEIGHT_OF_ITEMS'], axis=1).fillna(0)
@@ -120,38 +127,77 @@ def main():
     logger.info('Target to Numpy - started')
     y = y.to_numpy().reshape(-1, 1)
 
-    print(X.shape)
-    print(y.shape)
-
     logger.info('Split test set - started')
     train_X, test_X, train_y, test_y = train_test_split(X, y, test_size=0.2, random_state=500)
 
-
-
     if s.run_baseline:
         logger.info('Set baseline - started')
-        y_mean = np.repeat(train_y.mean(), len(train_y))
-        baseline = bl(train_y, y_mean)
-        print(baseline)
-        logger.info('Baseline results: ' + str(baseline))
+        y_mean_train = np.repeat(train_y.mean(), len(train_y))
+        baseline_train = bl(train_y, y_mean_train)
+
+        y_mean_test = np.repeat(test_y.mean(), len(test_y))
+        baseline_test = bl(test_y, y_mean_test)
+
+        print(baseline_train)
+        logger.info('Baseline result training: ' + str(baseline_train))
+        print(baseline_test)
+        logger.info('Baseline result test: ' + str(baseline_test))
 
     if s.run_ridge:
         logger.info('Start training ridge regression - started')
-        ridge = rr(train_X, train_y)
-        print(ridge)
-        logger.info('Ridge regression results: ' + str(ridge))
+        _, params, train_rmse, model_rr, grid_result = rr(train_X, train_y)
+        test_r2 = get_r2(test_y, grid_result.predict(test_X))
+        test_rmse = get_rmse(test_y, grid_result.predict(test_X))
+
+        print('train params: ', params)
+        print("train rmse: ", train_rmse)
+        print("test_r2: ", test_r2)
+        print("test_rmse: ", test_rmse)
+        logger.info('Ridge regression parameters: ' + str(params))
+        logger.info('Ridge regression result training: ' + str(train_rmse))
+        logger.info('Ridge regression result test r2: ' + str(test_r2))
+        logger.info('Ridge regression result test rmse: ' + str(test_rmse))
 
     if s.run_forest:
+        #logger.info('Start training random forest regression - started')
+        #forest = rfr(train_X, train_y)
+        #print(forest)
+        #logger.info('Random forest regression results: ' + str(forest))
+
         logger.info('Start training random forest regression - started')
-        forest = rfr(train_X, train_y)
-        print(forest)
-        logger.info('Random forest regression results: ' + str(forest))
+        _, params, train_rmse, model_rfr, grid_result = rfr(train_X, train_y)
+        test_r2 = get_r2(test_y, grid_result.predict(test_X))
+        test_rmse = get_rmse(test_y, grid_result.predict(test_X))
+
+        print('train params: ', params)
+        print("train rmse: ", train_rmse)
+        print("test_r2: ", test_r2)
+        print("test_rmse: ", test_rmse)
+        logger.info('Random forest regression parameters: ' + str(params))
+        logger.info('Random forest regression result training: ' + str(train_rmse))
+        logger.info('Random forest regression result test r2: ' + str(test_r2))
+        logger.info('Random forest regression result test rmse: ' + str(test_rmse))
 
     if s.run_neural:
-        logger.info('Start training neural network - started')
-        neural = nn(train_X, train_y)
-        print(neural)
-        logger.info('Neural network results: ' + str(neural))
+        logger.info('Start neural network - started')
+        _, params, train_rmse, optimizer, grid_result = nn(train_X, train_y)
+        test_r2 = get_r2(test_y, grid_result.predict(test_X))
+        test_rmse = get_rmse(test_y, grid_result.predict(test_X))
+
+        print('train params: ', params)
+        print("train rmse: ", train_rmse)
+        print("test_r2: ", test_r2)
+        print("test_rmse: ", test_rmse)
+        logger.info('Neural network parameters: ' + str(params))
+        logger.info('Neural network optimizer: ' + str(optimizer))
+        logger.info('Neural network result training: ' + str(train_rmse))
+        logger.info('Neural network result test r2: ' + str(test_r2))
+        logger.info('Neural network result test rmse: ' + str(test_rmse))
+
+        #logger.info('Start training neural network - started')
+        #neural = nn(train_X, train_y)
+        #print(neural)
+        #logger.info('Neural network results: ' + str(neural))
 
 
 
