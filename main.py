@@ -31,7 +31,7 @@ from models.ridge_regression import ridge_regression as rr
 from models.ridge_regression import ridge_cv as rr2
 from models.random_forest_regression import random_forest_regression as rfr
 from models.neural_network import neural_network as nn
-from evaluation_metric import get_rmse, get_r2
+from evaluation_metric import get_rmse, get_r2, rmse_second
 
 
 
@@ -65,31 +65,38 @@ def main():
     logger.info('OneHotEncode categorical variables - started')
     columns_ohe = ['HUB_NL',
                    'COUNTRY_CODE',
-                   'SOURCE',
+                   #'SOURCE',
                    'WEEKDAY_OF_DEPARTURE',
                    'MONTH_OF_DEPARTURE',
                    'TIMESLOT_OF_DEPARTURE',
-                   'WEEKDAY_OF_BOOKING',
-                   'WEEKDAY_OF_BOOKING_BAG']
+                   'WEEKDAY_OF_BOOKING'
+        #,
+                   #'WEEKDAY_OF_BOOKING_BAG'
+                     ]
     data_dummies = prepdat.dummy_columns(data_prices, columns_ohe)
 
     logger.info('Retrieve final dataset - started')
     columns_drop = ['DEPARTURE_DATE',
                     'HUB_NL',
-                   'COUNTRY_CODE',
-                   'SOURCE',
-                   'WEEKDAY_OF_DEPARTURE',
-                   'MONTH_OF_DEPARTURE',
-                   'TIMESLOT_OF_DEPARTURE',
-                   'WEEKDAY_OF_BOOKING',
-                   'WEEKDAY_OF_BOOKING_BAG',
-                   'BKR_BOOKING',
-                   'DEPARTURE_AIRPORT',
-                   'ARRIVAL_AIRPORT',
-                   'BOOKING_DATE',
-                   'BOOKING_DATE_BAG',
-                   'PRICING_TIME',
-                   'LEVEL']
+                    'COUNTRY_CODE',
+                    'SOURCE',
+                    'WEEKDAY_OF_DEPARTURE',
+                    'MONTH_OF_DEPARTURE',
+                    'TIMESLOT_OF_DEPARTURE',
+                    'WEEKDAY_OF_BOOKING',
+                    'WEEKDAY_OF_BOOKING_BAG',
+                    'BKR_BOOKING',
+                    'DEPARTURE_AIRPORT',
+                    'ARRIVAL_AIRPORT',
+                    'BOOKING_DATE',
+                    'BOOKING_DATE_BAG',
+                    'PRICING_TIME',
+                    'LEVEL',
+                    ####DELETE DATA BASED ON CORRELATIONS
+                    #'GROUPBOOKING'
+                    #'DIRECTION',
+                    #'SEASONALITY'
+                    ]
     data = prepdat.delete_columns(data_dummies, columns_drop)
 
     """"Retrieve heatmap correlation"""
@@ -107,7 +114,7 @@ def main():
     logger.info('Standardize continuous features - started')
     columns_std_x = ['TOTAL_LEG_DISTANCE_KM',
                    'BOOKING_DBD',
-                   'BOOKING_BAG_DBD',
+                   #'BOOKING_BAG_DBD',
                    'LENGTH_OF_STAY',
                    'NBR_OF_PAX_IN_PNR',
                    'BOOKING_TICKET_REVENUE_INCL_TAX',
@@ -116,7 +123,8 @@ def main():
                    'PRICE_25KG',
                    'PRICE_30KG',
                    'PRICE_40KG',
-                   'PRICE_50KG']
+                   'PRICE_50KG'
+                     ]
 
     ct = ColumnTransformer([
         ('Standardized', StandardScaler(), columns_std_x)
@@ -159,11 +167,6 @@ def main():
         logger.info('Ridge regression result test rmse: ' + str(test_rmse))
 
     if s.run_forest:
-        #logger.info('Start training random forest regression - started')
-        #forest = rfr(train_X, train_y)
-        #print(forest)
-        #logger.info('Random forest regression results: ' + str(forest))
-
         logger.info('Start training random forest regression - started')
         _, params, train_rmse, model_rfr, grid_result = rfr(train_X, train_y)
         test_r2 = get_r2(test_y, grid_result.predict(test_X))
@@ -193,14 +196,6 @@ def main():
         logger.info('Neural network result training: ' + str(train_rmse))
         logger.info('Neural network result test r2: ' + str(test_r2))
         logger.info('Neural network result test rmse: ' + str(test_rmse))
-
-        #logger.info('Start training neural network - started')
-        #neural = nn(train_X, train_y)
-        #print(neural)
-        #logger.info('Neural network results: ' + str(neural))
-
-
-
 
 
 

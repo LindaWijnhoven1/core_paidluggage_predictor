@@ -11,13 +11,14 @@ from keras.wrappers.scikit_learn import KerasRegressor
 from sklearn.model_selection import GridSearchCV
 
 def neural_network(train_x, train_y):
-    parameters = {'epochs': [10, 15],
-                  'batch_size': [100, 150]
+    parameters = {'epochs': [15, 10],
+                  'batch_size': [100, 150,200]
                   }
 
     optimizer = Adam(lr=0.001, beta_1=0.9, beta_2=0.999)
+    #optimizer = 'rmsprop'
 
-    es = EarlyStopping(monitor='loss', mode='min', verbose=2, min_delta=10, patience=1)
+    es = EarlyStopping(monitor='loss', mode='min', verbose=2, min_delta=0.5, patience=1)
 
     scoring = {'r2': make_scorer(get_r2),
                'rmse': make_scorer(get_rmse, greater_is_better=False)}

@@ -7,7 +7,11 @@ def get_rmse(y, y_pred):
     rmse = np.sqrt(mean_squared_error(y, y_pred))
     print
     'RMSE: %2.3f' % rmse
-    return abs(rmse)
+    return rmse
+
+def rmse_second(y, y_pred):
+    rmse = np.sqrt(((y_pred - y) ** 2).mean())
+    return rmse
 
 
 def get_r2(y, y_pred):
@@ -15,8 +19,3 @@ def get_r2(y, y_pred):
     print
     'R2: %2.3f' % r2
     return r2
-
-#def rmse_r2(y_true, y_pred):
-#    score = get_rmse(y_true, y_pred)
-#    get_r2(y_true, y_pred)
-#    return score
