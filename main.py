@@ -92,6 +92,7 @@ def main():
                     'BOOKING_DATE_BAG',
                     'PRICING_TIME',
                     'LEVEL',
+                    'BOOKING_BAG_DBD'
                     ####DELETE DATA BASED ON CORRELATIONS
                     #'GROUPBOOKING'
                     #'DIRECTION',

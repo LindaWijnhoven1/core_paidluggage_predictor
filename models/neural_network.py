@@ -15,8 +15,8 @@ def neural_network(train_x, train_y):
                   'batch_size': [100, 150,200]
                   }
 
-    optimizer = Adam(lr=0.001, beta_1=0.9, beta_2=0.999)
-    #optimizer = 'rmsprop'
+    #optimizer = Adam(lr=0.001, beta_1=0.9, beta_2=0.999)
+    optimizer = 'rmsprop'
 
     es = EarlyStopping(monitor='loss', mode='min', verbose=2, min_delta=0.5, patience=1)
 
