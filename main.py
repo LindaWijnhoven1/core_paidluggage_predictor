@@ -100,11 +100,20 @@ def main():
                     ]
     data = prepdat.delete_columns(data_dummies, columns_drop)
 
+    ###DELETE IF DATA IS RETRIEVED AGAIN
+    data['GROUPBOOKING'] = pd.to_numeric(data['GROUPBOOKING'])
+    data['SEASONALITY'] = pd.to_numeric(data['SEASONALITY'])
+
     """"Retrieve heatmap correlation"""
     #corr_matrix = data.corr()
     #print(corr_matrix)
     #corr_matrix.to_csv("corr_matrix.csv")
+    #print(data['GROUPBOOKING'].corr(data['WEIGHT_OF_ITEMS']))
+    #print(data['SEASONALITY'].corr(data['WEIGHT_OF_ITEMS']))
     """End of heatmap correlation"""
+
+
+
 
     logger.info('Used features: ' + data.columns)
 
