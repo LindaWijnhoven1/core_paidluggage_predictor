@@ -12,11 +12,11 @@ from sklearn.model_selection import GridSearchCV
 
 def neural_network(train_x, train_y):
     parameters = {'epochs': [15, 10],
-                  'batch_size': [100, 150,200]
+                  'batch_size': [150, 200]
                   }
 
-    #optimizer = Adam(lr=0.001, beta_1=0.9, beta_2=0.999)
-    optimizer = 'rmsprop'
+    optimizer = Adam(lr=0.001, beta_1=0.9, beta_2=0.999)
+    #optimizer = 'rmsprop'
 
     es = EarlyStopping(monitor='loss', mode='min', verbose=2, min_delta=0.5, patience=1)
 
@@ -27,17 +27,19 @@ def neural_network(train_x, train_y):
     def create_network():
         rgr = Sequential()
         rgr.add(Dense(units=256, activation='relu', input_dim=train_x.shape[1]))
-        rgr.add(Dense(units=128, activation='relu'))
-        rgr.add(Dense(units=64, activation='relu'))
+        rgr.add(Dense(units=200, activation='relu'))
+        rgr.add(Dense(units=120, activation='relu'))
+        rgr.add(Dense(units=80, activation='relu'))
+        rgr.add(Dense(units=20, activation='relu'))
         rgr.add(Dense(units=1))
 
         rgr.compile(loss='mean_squared_error',
                     optimizer=optimizer)
         return rgr
 
-    grid_rgr = KerasRegressor(build_fn=create_network, verbose=2, )
+    grid_rgr = KerasRegressor(build_fn=create_network, verbose=2)
 
-    nn = GridSearchCV(grid_rgr, parameters, scoring='neg_mean_squared_error', cv=3) #refit='rmse')
+    nn = GridSearchCV(grid_rgr, parameters, scoring='neg_mean_squared_error', cv=3)
     grid_result = nn.fit(train_x, train_y, callbacks=[es])
 
     scores = grid_result.cv_results_

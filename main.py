@@ -8,9 +8,7 @@ import numpy as np
 import datetime as dt
 from azure.datalake.store import core, lib
 from sklearn.model_selection import train_test_split
-from sklearn import metrics
 from datetime import datetime
-from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 from sklearn.preprocessing import StandardScaler
 from sklearn.compose import ColumnTransformer
 
@@ -28,10 +26,9 @@ import credentials as c
 import configure_log as l
 from models.baseline import baseline as bl
 from models.ridge_regression import ridge_regression as rr
-from models.ridge_regression import ridge_cv as rr2
 from models.random_forest_regression import random_forest_regression as rfr
 from models.neural_network import neural_network as nn
-from evaluation_metric import get_rmse, get_r2, rmse_second
+from evaluation_metric import get_rmse, get_r2
 
 
 
@@ -65,15 +62,13 @@ def main():
     logger.info('OneHotEncode categorical variables - started')
     columns_ohe = ['HUB_NL',
                    'COUNTRY_CODE',
-                   #'SOURCE',
                    'WEEKDAY_OF_DEPARTURE',
                    'MONTH_OF_DEPARTURE',
                    'TIMESLOT_OF_DEPARTURE',
                    'WEEKDAY_OF_BOOKING'
-        #,
-                   #'WEEKDAY_OF_BOOKING_BAG'
                      ]
     data_dummies = prepdat.dummy_columns(data_prices, columns_ohe)
+
 
     logger.info('Retrieve final dataset - started')
     columns_drop = ['DEPARTURE_DATE',
@@ -108,23 +103,24 @@ def main():
     #corr_matrix = data.corr()
     #print(corr_matrix)
     #corr_matrix.to_csv("corr_matrix.csv")
+    #print('pearson')
     #print(data['GROUPBOOKING'].corr(data['WEIGHT_OF_ITEMS']))
     #print(data['SEASONALITY'].corr(data['WEIGHT_OF_ITEMS']))
+    #print('pointbiserial')
+    #print(stats.pointbiserialr(data['GROUPBOOKING'], data['WEIGHT_OF_ITEMS']))
+    #print(stats.pointbiserialr(data['SEASONALITY'], data['WEIGHT_OF_ITEMS']))
     """End of heatmap correlation"""
-
-
-
 
     logger.info('Used features: ' + data.columns)
 
     logger.info('Retrieve target and features - started')
     X = data.drop(['WEIGHT_OF_ITEMS'], axis=1).fillna(0)
+    print(X.columns)
     y = data['WEIGHT_OF_ITEMS'].fillna(0)
 
     logger.info('Standardize continuous features - started')
     columns_std_x = ['TOTAL_LEG_DISTANCE_KM',
                    'BOOKING_DBD',
-                   #'BOOKING_BAG_DBD',
                    'LENGTH_OF_STAY',
                    'NBR_OF_PAX_IN_PNR',
                    'BOOKING_TICKET_REVENUE_INCL_TAX',
@@ -141,12 +137,14 @@ def main():
     ], remainder='passthrough')
 
     ct.fit_transform(X[columns_std_x])
+    print(X.shape)
 
     logger.info('Target to Numpy - started')
     y = y.to_numpy().reshape(-1, 1)
 
     logger.info('Split test set - started')
     train_X, test_X, train_y, test_y = train_test_split(X, y, test_size=0.2, random_state=500)
+    #train_X, test_X, train_y, test_y = train_test_split(X, y, test_size=0.3, random_state=555)
 
     if s.run_baseline:
         logger.info('Set baseline - started')
@@ -178,15 +176,21 @@ def main():
 
     if s.run_forest:
         logger.info('Start training random forest regression - started')
-        _, params, train_rmse, model_rfr, grid_result = rfr(train_X, train_y)
+        _, params, train_rmse, model_rfr, grid_result, features, features_score = rfr(train_X, train_y)
         test_r2 = get_r2(test_y, grid_result.predict(test_X))
         test_rmse = get_rmse(test_y, grid_result.predict(test_X))
+        important_features = features
+        features_scores = features_score
 
         print('train params: ', params)
+        print('train best features: ', important_features)
+        print('train best features score: ', features_scores)
         print("train rmse: ", train_rmse)
         print("test_r2: ", test_r2)
         print("test_rmse: ", test_rmse)
         logger.info('Random forest regression parameters: ' + str(params))
+        logger.info('Random forest regression best features: ' + str(important_features))
+        logger.info('Random forest regression best features scores: ' + str(features_scores))
         logger.info('Random forest regression result training: ' + str(train_rmse))
         logger.info('Random forest regression result test r2: ' + str(test_r2))
         logger.info('Random forest regression result test rmse: ' + str(test_rmse))
