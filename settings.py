@@ -1,3 +1,4 @@
+# Import packages
 from datetime import datetime
 
 # Initial parameters to set period of data extraction
@@ -22,7 +23,7 @@ file_log = filename_log + datetime_log
 # Runs of models
 run_baseline = False
 run_ridge = False
-run_forest = True
+run_forest = False
 run_neural = False
 
 # Set type of authentication for DWH. Values:

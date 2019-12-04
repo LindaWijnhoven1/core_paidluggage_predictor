@@ -1,14 +1,17 @@
+# Import packages
 import numpy as np
-
-from evaluation_metric import get_rmse, get_r2
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import make_scorer
 
+# Custom imports
+from evaluation_metric import get_rmse, get_r2
+
+
 
 def random_forest_regression(train_x, train_y):
-    parameters = {'max_depth': [60],
-                  'n_estimators': [100]}
+    parameters = {'max_depth': [5,10,15,20,60,80],
+                  'n_estimators': [10,100,150,200,250]}
     scoring = {'r2': make_scorer(get_r2), 'rmse': make_scorer(get_rmse, greater_is_better=False)}
 
     rgr = RandomForestRegressor(random_state=500, n_jobs=-1, verbose=2)

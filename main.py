@@ -12,12 +12,11 @@ from datetime import datetime
 from sklearn.preprocessing import StandardScaler
 from sklearn.compose import ColumnTransformer
 
-
-
 # Import EDA packages
 import seaborn as sns
 import matplotlib
 from matplotlib import pyplot as plt
+import tikzplotlib
 
 # Custom imports
 import prepare_data as prepdat
@@ -88,10 +87,6 @@ def main():
                     'PRICING_TIME',
                     'LEVEL',
                     'BOOKING_BAG_DBD'
-                    ####DELETE DATA BASED ON CORRELATIONS
-                    #'GROUPBOOKING'
-                    #'DIRECTION',
-                    #'SEASONALITY'
                     ]
     data = prepdat.delete_columns(data_dummies, columns_drop)
 
@@ -99,23 +94,18 @@ def main():
     data['GROUPBOOKING'] = pd.to_numeric(data['GROUPBOOKING'])
     data['SEASONALITY'] = pd.to_numeric(data['SEASONALITY'])
 
-    """"Retrieve heatmap correlation"""
-    #corr_matrix = data.corr()
-    #print(corr_matrix)
-    #corr_matrix.to_csv("corr_matrix.csv")
-    #print('pearson')
-    #print(data['GROUPBOOKING'].corr(data['WEIGHT_OF_ITEMS']))
-    #print(data['SEASONALITY'].corr(data['WEIGHT_OF_ITEMS']))
-    #print('pointbiserial')
-    #print(stats.pointbiserialr(data['GROUPBOOKING'], data['WEIGHT_OF_ITEMS']))
-    #print(stats.pointbiserialr(data['SEASONALITY'], data['WEIGHT_OF_ITEMS']))
-    """End of heatmap correlation"""
+    plt.figure(figsize=(9, 8))
+    plt.style.use("ggplot")
+    #sns.countplot(x='GROUPBOOKING', data=data_prices)
+    sns.countplot((data_prices['BOOKING_DBD']/10000))
+    plt.ylabel("frequency")
+    plt.xlabel("")
+    tikzplotlib.save("group1.tex")
 
     logger.info('Used features: ' + data.columns)
 
     logger.info('Retrieve target and features - started')
     X = data.drop(['WEIGHT_OF_ITEMS'], axis=1).fillna(0)
-    print(X.columns)
     y = data['WEIGHT_OF_ITEMS'].fillna(0)
 
     logger.info('Standardize continuous features - started')
@@ -130,7 +120,7 @@ def main():
                    'PRICE_30KG',
                    'PRICE_40KG',
                    'PRICE_50KG'
-                     ]
+                    ]
 
     ct = ColumnTransformer([
         ('Standardized', StandardScaler(), columns_std_x)
@@ -144,7 +134,6 @@ def main():
 
     logger.info('Split test set - started')
     train_X, test_X, train_y, test_y = train_test_split(X, y, test_size=0.2, random_state=500)
-    #train_X, test_X, train_y, test_y = train_test_split(X, y, test_size=0.3, random_state=555)
 
     if s.run_baseline:
         logger.info('Set baseline - started')

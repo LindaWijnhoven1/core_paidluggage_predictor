@@ -1,4 +1,5 @@
-from evaluation_metric import get_rmse, rmse_second
+# Import packages
+from evaluation_metric import get_rmse
 from sklearn.metrics import mean_squared_error, r2_score
 
 def baseline(y, y_mean):
